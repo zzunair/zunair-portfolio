@@ -275,10 +275,15 @@ h6 {
 @media (min-width: 1024px) {
   #hero {
     background-attachment: fixed;
+   
   }
 }
 
 @media (max-width: 768px) {
+  #hero{
+    background: url("../img/profile.jpeg") top center;
+    background-repeat: no-repeat;
+  }
   #hero h1 {
     font-size: 28px;
     line-height: 36px;
