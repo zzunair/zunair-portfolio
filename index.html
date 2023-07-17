@@ -950,7 +950,7 @@
 
           </div>
           <div class="col-lg-7 mt-5 mt-lg-0 d-flex align-items-stretch">
-            <form action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSeJh7IaVf68ECO4HPqeEsmZ6QlPWLWrF5qGiCSNW3eiXRCFCw/formResponse" method="post" role="form" class="php-email-form">
+            <form action="https://formspree.io/f/mnqkqkyy" method="post" role="form" id="formspreeForm" class="php-email-form">
               <div class="row">
                 <div class="form-group col-md-6">
                   <label for="name">Your Name</label>
@@ -969,10 +969,16 @@
                 <label for="name">Message</label>
                 <textarea class="form-control" name="entry.1973076258" rows="10" required></textarea>
               </div>
+              <p id="my-form-status"></p>
               <div class="my-3">
                 <div class="loading">Loading</div>
-                <div class="error-message"></div>
-                <div class="sent-message">Your message has been sent. Thank you!</div>
+                <div class="error-message alert alert-danger" role="alert">
+                  Oops! There was a problem submitting your form"
+                </div>
+                <div class="sent-message alert alert-secondary" role="alert">
+                  Your message has been sent. Thank you!
+                </div>
+                <!-- <div class="sent-message">Your message has been sent. Thank you!</div> -->
               </div>
               <div class="text-center"><button type="submit">Send Message</button></div>
             </form>
@@ -1008,44 +1014,49 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
-  <!-- <script>
-    $(document).ready(function() {
-      $("form").submit(function(e) {
-        e.preventDefault();
-        $.ajax({
-          type: "POST",
-          url: "https://docs.google.com/forms/u/0/d/e/1FAIpQLSeJh7IaVf68ECO4HPqeEsmZ6QlPWLWrF5qGiCSNW3eiXRCFCw/formResponse",
-          data: $(this).serialize(),
-          success: function() {
-            $(".sent-message").html("Thank you for your message!");
-          }
-        });
-      });
-    });
-  </script> -->
-  <!-- <script>
-    $(".text-center button").click(function(ev) {
-      ev.preventDefault();
-            var form = $(".php-email-form");
-            var url = form.attr('action');
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: form.serialize(),
-                success: function(data) {
-                      
-                    // Ajax call completed successfully
-                    alert("Form Submited Successfully");
-                },
-                error: function(data) {
-                      
-                    // Some error in ajax call
-                    alert("some Error");
-                }
-            });
-        });
-  </script> -->
+  <script>
+    function ShowAlert(msg_title, msg_body, msg_type) {
+      var AlertMsg = $('div[role="alert"]');
+      $(AlertMsg).find('strong').html(msg_title);
+      $(AlertMsg).find('p').html(msg_body);
+      $(AlertMsg).removeAttr('class');
+      $(AlertMsg).addClass('alert alert-' + msg_type);
+      $(AlertMsg).show();
+    }
+    var form = document.getElementById("formspreeForm");
 
+    async function handleSubmit(event) {
+      event.preventDefault();
+      // var status = document.getElementById("my-form-status");
+      $(".sent-message").show();
+      var data = new FormData(event.target);
+      fetch(event.target.action, {
+        method: form.method,
+        body: data,
+        headers: {
+          'Accept': 'application/json'
+        }
+      }).then(response => {
+        if (response.ok) {
+          status.innerHTML = "Thanks for your submission!";
+          form.reset()
+        } else {
+          response.json().then(data => {
+            if (Object.hasOwn(data, 'errors')) {
+              status.innerHTML = data["errors"].map(error => error["message"]).join(", ")
+            } else {
+              $(".error-message").show();
+              // status.innerHTML = "Oops! There was a problem submitting your form"
+            }
+          })
+        }
+      }).catch(error => {
+        // status.innerHTML = "Oops! There was a problem submitting your form"
+        $(".error-message").show();
+      });
+    }
+    form.addEventListener("submit", handleSubmit)
+  </script>
 </body>
 
 </html>
